@@ -7,6 +7,10 @@ import { TokenType } from "./token";
 export const OPERATORS: Record<string, TokenType> = {
     "-[:TYPE]->": TokenType.RELATION_ARROW,
     "->": TokenType.ARROW,
+    "--": TokenType.UNDIRECTED_EDGE,  // must be before single "-"
+    "-": TokenType.DASH,             // standalone dash (start of -[ )
+    "*": TokenType.STAR,
+    "..": TokenType.DOT_DOT,
 
     "==": TokenType.EQUAL,
     "!=": TokenType.NOT_EQUAL,

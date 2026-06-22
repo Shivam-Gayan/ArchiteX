@@ -23,6 +23,21 @@ export enum TokenType {
     ONCE = "ONCE",
     EXISTS = "EXISTS",
 
+
+    //Error functions
+    ERROR = "ERROR",
+    WARNING = "WARNING",
+    INFO = "INFO",
+    HINT = "HINT",
+
+    //Aggregation functions
+    COUNT = "COUNT",
+    SUM = "SUM",
+    AVG = "AVG",
+    MAX = "MAX",
+    MIN = "MIN",
+    DEGREE = "DEGREE",
+
     // Operators / punctuation
     ASSIGN = "ASSIGN",             // =
     EQUAL = "EQUAL",               // ==
@@ -31,8 +46,18 @@ export enum TokenType {
     GREATER_THAN = "GREATER_THAN", // >
     LESS_EQUAL = "LESS_EQUAL",     // <=
     GREATER_EQUAL = "GREATER_EQUAL", // >=
+    NOT = "NOT",
+    AND = "AND",
+    OR = "OR",
+    IN = "IN",
+    CONTAINS = "CONTAINS",
+    WITH = "WITH",
+    BY = "BY",
+
 
     ARROW = "ARROW",               // ->
+    DASH = "DASH",                     // -  (standalone dash)(start of -[ )
+    UNDIRECTED_EDGE = "UNDIRECTED_EDGE", // --
     RELATION_ARROW = "RELATION_ARROW", // -[:TYPE]->
 
     COLON = "COLON",
