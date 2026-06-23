@@ -5,10 +5,9 @@ import { TokenType } from "./token";
  */
 // OPERATORS is an object mapping operator strings to their corresponding token types.
 export const OPERATORS: Record<string, TokenType> = {
-    "-[:TYPE]->": TokenType.RELATION_ARROW,
+    "--": TokenType.UNDIRECTED_EDGE,
     "->": TokenType.ARROW,
-    "--": TokenType.UNDIRECTED_EDGE,  // must be before single "-"
-    "-": TokenType.DASH,             // standalone dash (start of -[ )
+    "-": TokenType.DASH,
     "*": TokenType.STAR,
     "..": TokenType.DOT_DOT,
 

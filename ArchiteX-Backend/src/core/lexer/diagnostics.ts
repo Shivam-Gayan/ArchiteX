@@ -34,7 +34,7 @@ export function createLexerDiagnostic(
     message: string,
     line: number,
     column: number,
-    lexeme?: string
+    lexeme?: string   //lexeme: string | undefined;
 ): LexerDiagnostic {
     return {
         code,

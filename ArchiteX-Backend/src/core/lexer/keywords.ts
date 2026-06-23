@@ -14,6 +14,12 @@ export const KEYWORDS: Record<string, TokenType> = {
     ONCE: TokenType.ONCE,
     EXISTS: TokenType.EXISTS,
 
+
+    ERROR: TokenType.ERROR,
+    WARNING: TokenType.WARNING,
+    INFO: TokenType.INFO,
+    HINT: TokenType.HINT,
+
     NOT: TokenType.NOT,
     AND: TokenType.AND,
     OR: TokenType.OR,
