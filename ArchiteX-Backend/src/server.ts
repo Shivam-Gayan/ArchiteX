@@ -1,7 +1,7 @@
 // src/interfaces/http/server.ts
 import express from "express";
 import cors from "cors";
-import routes from "..\routes\api.routes.ts";
+import routes from "../routes/api.routes.ts";
 
 const app = express();
 
