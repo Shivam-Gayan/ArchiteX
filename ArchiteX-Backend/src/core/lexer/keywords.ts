@@ -14,7 +14,6 @@ export const KEYWORDS: Record<string, TokenType> = {
     ONCE: TokenType.ONCE,
     EXISTS: TokenType.EXISTS,
 
-
     ERROR: TokenType.ERROR,
     WARNING: TokenType.WARNING,
     INFO: TokenType.INFO,
@@ -39,6 +38,8 @@ export const KEYWORDS: Record<string, TokenType> = {
     // Boolean literals
     TRUE: TokenType.BOOLEAN,
     FALSE: TokenType.BOOLEAN,
+    true: TokenType.BOOLEAN,
+    false: TokenType.BOOLEAN
 };
 
 /**

@@ -53,12 +53,13 @@ export enum TokenType {
     CONTAINS = "CONTAINS",
     WITH = "WITH",
     BY = "BY",
+    STAR = "STAR",
+    DOT_DOT = "DOT_DOT",
 
 
     ARROW = "ARROW",               // ->
     DASH = "DASH",                     // -  (standalone dash)(start of -[ )
     UNDIRECTED_EDGE = "UNDIRECTED_EDGE", // --
-    RELATION_ARROW = "RELATION_ARROW", // -[:TYPE]->
 
     COLON = "COLON",
     COMMA = "COMMA",
@@ -84,7 +85,7 @@ export interface Token {
     /**
      * Original text exactly as it appeared in source.
      */
-    value: string;
+    lexeme: string;
 
     /**
      * 1-based line number.

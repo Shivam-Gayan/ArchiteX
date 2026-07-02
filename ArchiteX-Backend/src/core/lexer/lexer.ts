@@ -17,15 +17,26 @@ export class Lexer {
     private line = 1;
     private column = 1;
 
+    private startLine = 1;
+    private startColumn = 1;
+
     constructor(private source: string) { }
 
     //Main entry point.
     public tokenize() {
         while (!this.isAtEnd()) {
+            this.skipWhitespace();
+            if (this.isAtEnd()) break;
+
             this.start = this.current;
+            this.startLine = this.line;
+            this.startColumn = this.column;
             this.scanToken();
         }
 
+        this.start = this.current;
+        this.startLine = this.line;
+        this.startColumn = this.column;
         this.addToken(TokenType.EOF);
 
         return {
@@ -76,6 +87,33 @@ export class Lexer {
         return true;
     }
 
+    private skipWhitespace() {
+        while (!this.isAtEnd()) {
+            const c = this.peek();
+            switch (c) {
+                case ' ':
+                case '\r':
+                case '\t':
+                    this.advance();
+                    break;
+                case '\n':
+                    this.advance();
+                    this.line++;
+                    this.column = 1;
+                    break;
+                case '#':
+                    // Comments go to the end of the line
+                    this.advance(); // consume '#'
+                    while (this.peek() !== '\n' && !this.isAtEnd()) {
+                        this.advance();
+                    }
+                    break;
+                default:
+                    return;
+            }
+        }
+    }
+
     private addToken(type: TokenType) {
         const text = this.source.substring(
             this.start,
@@ -85,8 +123,8 @@ export class Lexer {
         this.tokens.push({
             type,
             lexeme: text,
-            line: this.line,
-            column: this.column,
+            line: this.startLine,
+            column: this.startColumn,
         });
     }
 
@@ -124,15 +162,35 @@ export class Lexer {
         this.addToken(type);
     }
 
+    private string() {
+        while (this.peek() !== '"' && !this.isAtEnd()) {
+            if (this.peek() === '\n') {
+                this.line++;
+                this.column = 1;
+            }
+            this.advance();
+        }
+        if (this.isAtEnd()) {
+            this.diagnostics.push({
+                code: LexerDiagnosticCode.UNTERMINATED_STRING,
+                message: "Unterminated string literal.",
+                line: this.startLine,
+                column: this.startColumn
+            });
+            return;
+        }
+        // Consume closing quote
+        this.advance();
+        this.addToken(TokenType.STRING);
+    }
     private error(message: string) {
         this.diagnostics.push({
             code: LexerDiagnosticCode.UNEXPECTED_CHARACTER,
             message,
-            line: this.line,
-            column: this.column
+            line: this.startLine,
+            column: this.startColumn
         });
     }
-
 
     private scanToken() {
         const c = this.advance();
@@ -166,12 +224,12 @@ export class Lexer {
                 this.addToken(TokenType.COLON);
                 break;
 
-            case ',':
-                this.addToken(TokenType.COMMA);
+            case '"':
+                this.string();
                 break;
 
-            case '.':
-                this.addToken(TokenType.DOT);
+            case ',':
+                this.addToken(TokenType.COMMA);
                 break;
 
             case ';':
