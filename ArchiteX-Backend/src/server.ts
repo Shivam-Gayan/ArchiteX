@@ -1,17 +1,28 @@
-// src/interfaces/http/server.ts
 import express from "express";
 import cors from "cors";
-import routes from "./interfaces/http/routes/api.routes";
+import type { RuleEngine } from "./engine/contracts/RuleEngine";
+import { createApiRouter } from "./api/routes/api.routes";
+import { jsonParseErrorHandler, globalErrorHandler } from "./api/middleware/errorHandler";
 
-const app = express();
+/**
+ * Creates and configures the Express application.
+ *
+ * Receives a RuleEngine instance so the server is fully testable
+ * with any implementation (MockRuleEngine or real ArchQLEngine).
+ */
+export function createApp(engine: RuleEngine) {
+  const app = express();
 
-app.use(cors());
-app.use(express.json());
+  // Parse JSON bodies. SyntaxError from malformed JSON is caught below.
+  app.use(express.json());
+  app.use(cors());
 
-app.use("/api/v1", routes);
+  // All API routes under /api/v1 — ApiContract.md §1: "Base URL: /api/v1"
+  app.use("/api/v1", createApiRouter(engine));
 
-app.listen(4000, () => {
-  console.log("Server is running on port 4000");
-});
+  // Error handlers MUST come after routes
+  app.use(jsonParseErrorHandler);
+  app.use(globalErrorHandler);
 
-export default app;
+  return app;
+}
