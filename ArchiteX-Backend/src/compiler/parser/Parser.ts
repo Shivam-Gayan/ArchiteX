@@ -115,7 +115,6 @@ export class Parser {
     if (!this.consume(TokenType.SEVERITY, "Expected 'SEVERITY' after rule name")) {
       this.synchronise(); return null;
     }
-    const severityTok = this.peek();
     const severity = this.parseSeverity();
     if (!severity) { this.synchronise(); return null; }
 
