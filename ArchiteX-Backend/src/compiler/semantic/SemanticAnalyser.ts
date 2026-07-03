@@ -70,11 +70,8 @@ interface BindingSets {
 export class SemanticAnalyser {
   /**
    * Analyses all rules in the batch.
-   *
-   * @param rules  Parsed RuleNode[] from the Parser.
-   * @param sourceFile  The .arch filename (used in diagnostics).
    */
-  analyse(rules: RuleNode[], sourceFile: string = "<unknown>"): SemanticAnalysisResult {
+  analyse(rules: RuleNode[]): SemanticAnalysisResult {
     const diagnostics: SemanticDiagnostic[] = [];
     const validRules: RuleNode[] = [];
 
