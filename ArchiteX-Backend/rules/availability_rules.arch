@@ -1,0 +1,46 @@
+# ArchiteX Availability Rules
+# Derived from ArchQL_v3_2.md §24 — Fully Detectable Anti-Patterns
+# These rules detect availability and resilience anti-patterns.
+
+# -------------------------------------------------------------------
+# Rule 1: Single Point of Failure
+# BY lb ensures each load balancer is evaluated independently.
+# -------------------------------------------------------------------
+RULE "Single Server Behind Load Balancer"
+SEVERITY ERROR
+
+MATCH (lb:LoadBalancer) -> (srv:Server)
+
+WHERE COUNT(srv) BY lb < 2
+
+YIELD "Load balancer has fewer than 2 servers — single point of failure" WITH lb, srv
+
+# -------------------------------------------------------------------
+# Rule 8: No Distributed Tracing
+# ONCE — global observation, not per-server noise.
+# -------------------------------------------------------------------
+RULE "No Distributed Tracing in Architecture"
+SEVERITY INFO
+
+MATCH (srv:Server)
+
+OPTIONAL (srv) -> (t:Tracing)
+
+WHERE NOT EXISTS(t)
+
+YIELD "No distributed tracing connected to any service" ONCE
+
+# -------------------------------------------------------------------
+# Rule 9: Single-Region Deployment
+# ONCE — global check on total database count.
+# -------------------------------------------------------------------
+RULE "Single Region Deployment"
+SEVERITY WARNING
+
+MATCH (db:Database)
+
+SIMULATE minDatabases = 2
+
+WHERE COUNT(db) < minDatabases
+
+YIELD "Fewer than the recommended number of databases detected — possible single-region deployment" ONCE

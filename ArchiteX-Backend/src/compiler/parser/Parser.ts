@@ -168,6 +168,7 @@ export class Parser {
       simulateBindings,
       whereClause,
       yieldClause,
+      sourceFile: "",   // stamped by RuleLoader after parsing
       line: ruleTok.line,
       column: ruleTok.column,
     };

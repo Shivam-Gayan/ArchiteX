@@ -228,6 +228,14 @@ export interface RuleNode {
 
   readonly yieldClause: YieldNode;
 
+  /**
+   * The .arch filename this rule was loaded from.
+   * Set to "" by the Parser (which does not know the file path).
+   * Stamped with the real filename by the RuleLoader.
+   * Used by the Evaluator to populate Violation.ruleFile.
+   */
+  readonly sourceFile: string;
+
   /** Source location — for diagnostics */
   readonly line: number;
   readonly column: number;

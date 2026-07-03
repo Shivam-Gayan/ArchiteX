@@ -1,0 +1,67 @@
+# ArchiteX Performance Rules
+# Derived from ArchQL_v3_2.md §24 — Fully Detectable Anti-Patterns
+# These rules detect performance anti-patterns in the architecture graph.
+
+# -------------------------------------------------------------------
+# Rule 3: Missing Cache Before Database
+# EXISTS path form — checks for a cache within 1-2 Reads hops.
+# -------------------------------------------------------------------
+RULE "No Cache Before Database"
+SEVERITY WARNING
+
+MATCH (srv:Server) -> (db:Database)
+
+WHERE NOT EXISTS((srv) -[:Reads*1..2]-> (:Cache))
+
+YIELD "Server reads database without a cache layer — high DB load risk" WITH srv, db
+
+# -------------------------------------------------------------------
+# Rule 13: God Service (Too Many Responsibilities)
+# DEGREE counts raw outbound edges — no BY needed.
+# -------------------------------------------------------------------
+RULE "God Service Anti-Pattern"
+SEVERITY WARNING
+
+MATCH (srv:Server)
+
+WHERE DEGREE(srv) > 8
+
+YIELD "Service has too many outbound connections — likely a God Service" WITH srv
+
+# -------------------------------------------------------------------
+# Rule 14: Deep Synchronous Call Chain
+# Path depth *6..20 catches 6+ synchronous hops.
+# -------------------------------------------------------------------
+RULE "Synchronous Call Chain Too Deep"
+SEVERITY WARNING
+
+MATCH (c:Client) -[:Calls*6..20]-> (db:Database)
+
+YIELD "Request reaches database through 6+ synchronous hops — latency and failure risk" WITH c, db
+
+# -------------------------------------------------------------------
+# Rule 17: Server CPU Exceeds Threshold
+# SIMULATE allows frontend to override the threshold.
+# -------------------------------------------------------------------
+RULE "Server CPU Exceeds Threshold"
+SEVERITY WARNING
+
+MATCH (srv:Server)
+
+SIMULATE maxCPU = 85
+
+WHERE srv.cpu > maxCPU
+
+YIELD "Server CPU exceeds acceptable threshold" WITH srv
+
+# -------------------------------------------------------------------
+# Rule 18: Excessive Message Broker Fan-Out
+# -------------------------------------------------------------------
+RULE "Excessive Message Fan-Out"
+SEVERITY WARNING
+
+MATCH (broker:MessageBroker)
+
+WHERE DEGREE(broker) > 20
+
+YIELD "Message broker fans out to too many consumers — throughput risk" WITH broker

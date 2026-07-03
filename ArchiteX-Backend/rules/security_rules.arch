@@ -1,0 +1,90 @@
+# ArchiteX Security Rules
+# Derived from ArchQL_v3_2.md §24 — Fully Detectable Anti-Patterns
+# These rules detect security anti-patterns in the architecture graph.
+
+# -------------------------------------------------------------------
+# Rule 2: Direct Client-to-Database Access
+# -------------------------------------------------------------------
+RULE "Client Directly Accesses Database"
+SEVERITY ERROR
+
+MATCH (c:Client) -> (db:Database)
+
+YIELD "Client is directly connected to a database — bypasses all security layers" WITH c, db
+
+# -------------------------------------------------------------------
+# Rule 4: API Gateway Without Authentication
+# NOT EXISTS(auth) tests whether THIS gateway has an auth service.
+# -------------------------------------------------------------------
+RULE "Unauthenticated API Gateway"
+SEVERITY ERROR
+
+MATCH (api:APIGateway)
+
+OPTIONAL (api) -> (auth:AuthService)
+
+WHERE NOT EXISTS(auth)
+
+YIELD "API Gateway has no authentication service" WITH api
+
+# -------------------------------------------------------------------
+# Rule 5: Server Exposed Without Load Balancer
+# -------------------------------------------------------------------
+RULE "Server Directly Reachable by Client"
+SEVERITY WARNING
+
+MATCH (c:Client) -> (srv:Server)
+
+WHERE NOT EXISTS((:LoadBalancer) -> (srv))
+
+YIELD "Server is directly reachable by client with no load balancer" WITH srv
+
+# -------------------------------------------------------------------
+# Rule 6: Publicly Exposed Database
+# -------------------------------------------------------------------
+RULE "Database Exposed to Internet"
+SEVERITY ERROR
+
+MATCH (db:Database {public:true})
+
+YIELD "Database is publicly accessible — critical security risk" WITH db
+
+# -------------------------------------------------------------------
+# Rule 10: Unencrypted Connection to Database
+# -------------------------------------------------------------------
+RULE "Unencrypted Database Connection"
+SEVERITY ERROR
+
+MATCH (srv:Server) -[conn:Writes {encrypted:false}]-> (db:Database)
+
+YIELD "Database write connection is not encrypted" WITH srv, db
+
+# -------------------------------------------------------------------
+# Rule 11: No Rate Limiting on Public API
+# ONCE — one global flag is enough to raise awareness.
+# -------------------------------------------------------------------
+RULE "Public API Without Rate Limiter"
+SEVERITY WARNING
+
+MATCH (api:APIGateway)
+
+OPTIONAL (api) -> (rl:RateLimiter)
+
+WHERE NOT EXISTS(rl)
+
+YIELD "API Gateway has no rate limiter — vulnerable to abuse and DDoS" WITH api ONCE
+
+# -------------------------------------------------------------------
+# Rule 25 (Complete Example): Client Reads Directly From Public DB
+# -------------------------------------------------------------------
+RULE "Client Reads Directly From Public Database"
+SEVERITY ERROR
+
+MATCH (c:Client) -[:Reads]-> (db:Database)
+
+OPTIONAL (c) -> (gw:APIGateway)
+
+WHERE NOT EXISTS(gw)
+  AND db.public = true
+
+YIELD "Client reads directly from a public database with no API gateway" WITH c, db
