@@ -24,7 +24,7 @@
 import type { GraphContext } from "../graph/contracts/GraphContext";
 import type { GraphNode } from "../graph/models/GraphNode";
 import type { GraphEdge } from "../graph/models/GraphEdge";
-import type { BindingEnv, BoundValue } from "./BindingEnv";
+import type { BindingEnv } from "./BindingEnv";
 import type {
   RuleNode,
   BooleanExpr,
