@@ -1,16 +1,23 @@
+import path from "path";
 import { createApp } from "./server";
-import { MockRuleEngine } from "./engine/services/MockRuleEngine";
+import { ArchQLEngine } from "./engine/ArchQLEngine";
 
 const PORT = 4000;
 
-async function bootstrap() {
-  // TODO: Replace MockRuleEngine with real ArchQLEngine once Dev C integrates it.
-  // The swap is a one-liner here — everything else stays the same.
-  const engine = new MockRuleEngine();
+// Rule files shipped with the backend — relative to the project root
+const RULES_DIR = path.join(__dirname, "..", "rules");
+const RULE_FILES = [
+  path.join(RULES_DIR, "availability_rules.arch"),
+  path.join(RULES_DIR, "performance_rules.arch"),
+  path.join(RULES_DIR, "security_rules.arch"),
+];
 
-  // Load rules at startup
-  // TODO: Pass real .arch file paths from config once they exist
-  await engine.loadRules([]);
+async function bootstrap() {
+  const engine = new ArchQLEngine();
+
+  // Load and compile all .arch rule files at startup.
+  // The engine logs warnings for any files with diagnostics but does not throw.
+  await engine.loadRules(RULE_FILES);
 
   const app = createApp(engine);
 
